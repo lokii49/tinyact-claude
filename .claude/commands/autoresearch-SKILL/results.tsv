@@ -1,0 +1,5 @@
+experiment	score	max_score	pass_rate	status	description
+0	25	30	83.3%	baseline	original skill — no changes
+1	29	30	96.7%	keep	added iOS Invitations screen + Android Notifications/Partnership screens to feature tables
+2	30	30	100.0%	keep	named Firebase function entry points (onStreakUpdated, onGroupInvitationCreated, etc.)
+3	30	30	100.0%	keep	fixed wrong iOS Goals path Goals/ → MyGoals/ (factual correctness, not caught by test suite)

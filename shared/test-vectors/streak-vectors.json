@@ -1,0 +1,557 @@
+[
+  {
+    "id": "solo-no-completions",
+    "description": "No completions → streak is 0",
+    "scenario": "solo",
+    "subtype": "count",
+    "input": {
+      "completions": [],
+      "pausedDaySeconds": [],
+      "breakDateSeconds": null,
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 0 }
+  },
+  {
+    "id": "solo-basic-3day",
+    "description": "Three consecutive days ending today",
+    "scenario": "solo",
+    "subtype": "count",
+    "input": {
+      "completions": [
+        { "timestampSeconds": 1739750400, "userID": "u1" },
+        { "timestampSeconds": 1739836800, "userID": "u1" },
+        { "timestampSeconds": 1739923200, "userID": "u1" }
+      ],
+      "pausedDaySeconds": [],
+      "breakDateSeconds": null,
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 3 }
+  },
+  {
+    "id": "solo-yesterday-start",
+    "description": "Only yesterday completion: streak = 1",
+    "scenario": "solo",
+    "subtype": "count",
+    "input": {
+      "completions": [
+        { "timestampSeconds": 1739836800, "userID": "u1" }
+      ],
+      "pausedDaySeconds": [],
+      "breakDateSeconds": null,
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 1 }
+  },
+  {
+    "id": "solo-missed-day-breaks",
+    "description": "Feb 18 missed: streak starts over from today (day 1)",
+    "scenario": "solo",
+    "subtype": "count",
+    "input": {
+      "completions": [
+        { "timestampSeconds": 1739491200, "userID": "u1" },
+        { "timestampSeconds": 1739577600, "userID": "u1" },
+        { "timestampSeconds": 1739664000, "userID": "u1" },
+        { "timestampSeconds": 1739750400, "userID": "u1" },
+        { "timestampSeconds": 1739923200, "userID": "u1" }
+      ],
+      "pausedDaySeconds": [],
+      "breakDateSeconds": null,
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 1 }
+  },
+  {
+    "id": "solo-paused-days",
+    "description": "Feb 17-18 are paused: streak counts through paused days",
+    "scenario": "solo",
+    "subtype": "count",
+    "input": {
+      "completions": [
+        { "timestampSeconds": 1739491200, "userID": "u1" },
+        { "timestampSeconds": 1739577600, "userID": "u1" },
+        { "timestampSeconds": 1739664000, "userID": "u1" },
+        { "timestampSeconds": 1739923200, "userID": "u1" }
+      ],
+      "pausedDaySeconds": [1739750400, 1739836800],
+      "breakDateSeconds": null,
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 4 }
+  },
+  {
+    "id": "solo-breakdate",
+    "description": "Completions before breakDate (Feb 16 midnight) are filtered out",
+    "scenario": "solo",
+    "subtype": "count",
+    "input": {
+      "completions": [
+        { "timestampSeconds": 1739318400, "userID": "u1" },
+        { "timestampSeconds": 1739404800, "userID": "u1" },
+        { "timestampSeconds": 1739750400, "userID": "u1" },
+        { "timestampSeconds": 1739836800, "userID": "u1" },
+        { "timestampSeconds": 1739923200, "userID": "u1" }
+      ],
+      "pausedDaySeconds": [],
+      "breakDateSeconds": 1739664000,
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 3 }
+  },
+  {
+    "id": "solo-not-today-or-yesterday",
+    "description": "Last completion was 3 days ago: streak = 0",
+    "scenario": "solo",
+    "subtype": "count",
+    "input": {
+      "completions": [
+        { "timestampSeconds": 1739318400, "userID": "u1" },
+        { "timestampSeconds": 1739404800, "userID": "u1" },
+        { "timestampSeconds": 1739664000, "userID": "u1" }
+      ],
+      "pausedDaySeconds": [],
+      "breakDateSeconds": null,
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 0 }
+  },
+  {
+    "id": "partnership-both-complete",
+    "description": "Both users complete same 3 days",
+    "scenario": "partnership",
+    "subtype": "partnership-count",
+    "input": {
+      "userCompletions": [
+        { "timestampSeconds": 1739750400, "userID": "u1" },
+        { "timestampSeconds": 1739836800, "userID": "u1" },
+        { "timestampSeconds": 1739923200, "userID": "u1" }
+      ],
+      "partnerCompletions": [
+        { "timestampSeconds": 1739750400, "userID": "u2" },
+        { "timestampSeconds": 1739836800, "userID": "u2" },
+        { "timestampSeconds": 1739923200, "userID": "u2" }
+      ],
+      "pausedDaySeconds": [],
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 3 }
+  },
+  {
+    "id": "partnership-one-misses",
+    "description": "u2 misses Feb 17: intersection breaks, streak = 2 (only Feb 18+19 in both)",
+    "scenario": "partnership",
+    "subtype": "partnership-count",
+    "input": {
+      "userCompletions": [
+        { "timestampSeconds": 1739491200, "userID": "u1" },
+        { "timestampSeconds": 1739577600, "userID": "u1" },
+        { "timestampSeconds": 1739664000, "userID": "u1" },
+        { "timestampSeconds": 1739750400, "userID": "u1" },
+        { "timestampSeconds": 1739836800, "userID": "u1" },
+        { "timestampSeconds": 1739923200, "userID": "u1" }
+      ],
+      "partnerCompletions": [
+        { "timestampSeconds": 1739491200, "userID": "u2" },
+        { "timestampSeconds": 1739577600, "userID": "u2" },
+        { "timestampSeconds": 1739664000, "userID": "u2" },
+        { "timestampSeconds": 1739836800, "userID": "u2" },
+        { "timestampSeconds": 1739923200, "userID": "u2" }
+      ],
+      "pausedDaySeconds": [],
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 2 }
+  },
+  {
+    "id": "partnership-user-only",
+    "description": "Only user has completions, partner has none: streak = 0",
+    "scenario": "partnership",
+    "subtype": "partnership-count",
+    "input": {
+      "userCompletions": [
+        { "timestampSeconds": 1739750400, "userID": "u1" },
+        { "timestampSeconds": 1739836800, "userID": "u1" },
+        { "timestampSeconds": 1739923200, "userID": "u1" }
+      ],
+      "partnerCompletions": [],
+      "pausedDaySeconds": [],
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 0 }
+  },
+  {
+    "id": "partnership-missed-breaks",
+    "description": "Both miss Feb 17: partnership streak breaks to 2 (no mercy)",
+    "scenario": "partnership",
+    "subtype": "partnership-count",
+    "input": {
+      "userCompletions": [
+        { "timestampSeconds": 1739491200, "userID": "u1" },
+        { "timestampSeconds": 1739577600, "userID": "u1" },
+        { "timestampSeconds": 1739664000, "userID": "u1" },
+        { "timestampSeconds": 1739836800, "userID": "u1" },
+        { "timestampSeconds": 1739923200, "userID": "u1" }
+      ],
+      "partnerCompletions": [
+        { "timestampSeconds": 1739491200, "userID": "u2" },
+        { "timestampSeconds": 1739577600, "userID": "u2" },
+        { "timestampSeconds": 1739664000, "userID": "u2" },
+        { "timestampSeconds": 1739836800, "userID": "u2" },
+        { "timestampSeconds": 1739923200, "userID": "u2" }
+      ],
+      "pausedDaySeconds": [],
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 2 }
+  },
+  {
+    "id": "group-all-complete",
+    "description": "All 3 members complete same 3 days",
+    "scenario": "group",
+    "subtype": "group-count",
+    "input": {
+      "memberCompletions": {
+        "u1": [
+          { "timestampSeconds": 1739750400, "userID": "u1" },
+          { "timestampSeconds": 1739836800, "userID": "u1" },
+          { "timestampSeconds": 1739923200, "userID": "u1" }
+        ],
+        "u2": [
+          { "timestampSeconds": 1739750400, "userID": "u2" },
+          { "timestampSeconds": 1739836800, "userID": "u2" },
+          { "timestampSeconds": 1739923200, "userID": "u2" }
+        ],
+        "u3": [
+          { "timestampSeconds": 1739750400, "userID": "u3" },
+          { "timestampSeconds": 1739836800, "userID": "u3" },
+          { "timestampSeconds": 1739923200, "userID": "u3" }
+        ]
+      },
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 3 }
+  },
+  {
+    "id": "group-one-misses",
+    "description": "Member u3 misses Feb 17: group streak = 2 (resets immediately)",
+    "scenario": "group",
+    "subtype": "group-count",
+    "input": {
+      "memberCompletions": {
+        "u1": [
+          { "timestampSeconds": 1739750400, "userID": "u1" },
+          { "timestampSeconds": 1739836800, "userID": "u1" },
+          { "timestampSeconds": 1739923200, "userID": "u1" }
+        ],
+        "u2": [
+          { "timestampSeconds": 1739750400, "userID": "u2" },
+          { "timestampSeconds": 1739836800, "userID": "u2" },
+          { "timestampSeconds": 1739923200, "userID": "u2" }
+        ],
+        "u3": [
+          { "timestampSeconds": 1739836800, "userID": "u3" },
+          { "timestampSeconds": 1739923200, "userID": "u3" }
+        ]
+      },
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 2 }
+  },
+  {
+    "id": "group-missed-day-breaks",
+    "description": "All members miss Feb 17: group streak breaks to 2 (same as solo — no mercy for anyone)",
+    "scenario": "group",
+    "subtype": "group-count",
+    "input": {
+      "memberCompletions": {
+        "u1": [
+          { "timestampSeconds": 1739491200, "userID": "u1" },
+          { "timestampSeconds": 1739577600, "userID": "u1" },
+          { "timestampSeconds": 1739664000, "userID": "u1" },
+          { "timestampSeconds": 1739836800, "userID": "u1" },
+          { "timestampSeconds": 1739923200, "userID": "u1" }
+        ],
+        "u2": [
+          { "timestampSeconds": 1739491200, "userID": "u2" },
+          { "timestampSeconds": 1739577600, "userID": "u2" },
+          { "timestampSeconds": 1739664000, "userID": "u2" },
+          { "timestampSeconds": 1739836800, "userID": "u2" },
+          { "timestampSeconds": 1739923200, "userID": "u2" }
+        ]
+      },
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": { "streakCount": 2 }
+  },
+  {
+    "id": "streak-obj-broken",
+    "description": "Last completion Feb 15: more than 1 day ago relative to Feb 19 — broken",
+    "scenario": "streak-object",
+    "subtype": "streak-object",
+    "input": {
+      "streak": {
+        "id": "s1",
+        "userIDs": ["u1"],
+        "isPaused": false,
+        "pausedAtSeconds": null,
+        "pauseResumeDateSeconds": null,
+        "currentStreak": 5,
+        "longestStreak": 10,
+        "lastCompletionDateSeconds": 1739577600
+      },
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": {
+      "currentStreak": 5,
+      "longestStreak": 10,
+      "isBroken": true
+    }
+  },
+  {
+    "id": "streak-obj-normal",
+    "description": "Last completion yesterday (Feb 18), today is Feb 19 — active streak",
+    "scenario": "streak-object",
+    "subtype": "streak-object",
+    "input": {
+      "streak": {
+        "id": "s1",
+        "userIDs": ["u1"],
+        "isPaused": false,
+        "pausedAtSeconds": null,
+        "pauseResumeDateSeconds": null,
+        "currentStreak": 5,
+        "longestStreak": 10,
+        "lastCompletionDateSeconds": 1739836800
+      },
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": {
+      "currentStreak": 5,
+      "longestStreak": 10,
+      "isBroken": false
+    }
+  },
+  {
+    "id": "streak-obj-paused",
+    "description": "Streak is paused — never broken regardless of dates",
+    "scenario": "streak-object",
+    "subtype": "streak-object",
+    "input": {
+      "streak": {
+        "id": "s1",
+        "userIDs": ["u1"],
+        "isPaused": true,
+        "pausedAtSeconds": 1739664000,
+        "pauseResumeDateSeconds": null,
+        "currentStreak": 5,
+        "longestStreak": 10,
+        "lastCompletionDateSeconds": 1739664000
+      },
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": {
+      "currentStreak": 5,
+      "longestStreak": 10,
+      "isBroken": false
+    }
+  },
+  {
+    "id": "streak-obj-no-completions",
+    "description": "No lastCompletionDate stored — fresh streak, not broken",
+    "scenario": "streak-object",
+    "subtype": "streak-object",
+    "input": {
+      "streak": {
+        "id": "s1",
+        "userIDs": ["u1"],
+        "isPaused": false,
+        "pausedAtSeconds": null,
+        "pauseResumeDateSeconds": null,
+        "currentStreak": 0,
+        "longestStreak": 0,
+        "lastCompletionDateSeconds": null
+      },
+      "nowSeconds": 1739923200,
+      "tzIdentifier": "UTC"
+    },
+    "expected": {
+      "currentStreak": 0,
+      "longestStreak": 0,
+      "isBroken": false
+    }
+  },
+  {
+    "id": "user-outcome-first",
+    "description": "First check-in ever: starts streak at 1, no comeback",
+    "scenario": "user-outcome",
+    "subtype": "user-outcome",
+    "input": {
+      "user": {
+        "id": "u1",
+        "totalCheckIns": 0,
+        "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0,
+        "reactionsGiven": 0,
+        "reactionsReceived": 0,
+        "comebackCount": 0,
+        "earnedAwardTypes": [],
+        "currentStreak": 0,
+        "longestStreak": 0,
+        "lastCheckInDateSeconds": null,
+        "timezone": "UTC"
+      },
+      "completionTimestampSeconds": 1739966400,
+      "tzIdentifier": "UTC",
+      "nowSeconds": 1739923200
+    },
+    "expected": {
+      "currentStreak": 1,
+      "longestStreak": 1,
+      "isComeback": false,
+      "shouldUpdateLastCheckInDate": true
+    }
+  },
+  {
+    "id": "user-outcome-consecutive",
+    "description": "Last check-in yesterday: increments streak",
+    "scenario": "user-outcome",
+    "subtype": "user-outcome",
+    "input": {
+      "user": {
+        "id": "u1",
+        "totalCheckIns": 5,
+        "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0,
+        "reactionsGiven": 0,
+        "reactionsReceived": 0,
+        "comebackCount": 0,
+        "earnedAwardTypes": [],
+        "currentStreak": 5,
+        "longestStreak": 10,
+        "lastCheckInDateSeconds": 1739880000,
+        "timezone": "UTC"
+      },
+      "completionTimestampSeconds": 1739966400,
+      "tzIdentifier": "UTC",
+      "nowSeconds": 1739923200
+    },
+    "expected": {
+      "currentStreak": 6,
+      "longestStreak": 10,
+      "isComeback": false,
+      "shouldUpdateLastCheckInDate": true
+    }
+  },
+  {
+    "id": "user-outcome-comeback",
+    "description": "Last check-in 5 days ago with prior check-ins: comeback",
+    "scenario": "user-outcome",
+    "subtype": "user-outcome",
+    "input": {
+      "user": {
+        "id": "u1",
+        "totalCheckIns": 10,
+        "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0,
+        "reactionsGiven": 0,
+        "reactionsReceived": 0,
+        "comebackCount": 0,
+        "earnedAwardTypes": [],
+        "currentStreak": 0,
+        "longestStreak": 7,
+        "lastCheckInDateSeconds": 1739534400,
+        "timezone": "UTC"
+      },
+      "completionTimestampSeconds": 1739966400,
+      "tzIdentifier": "UTC",
+      "nowSeconds": 1739923200
+    },
+    "expected": {
+      "currentStreak": 1,
+      "longestStreak": 7,
+      "isComeback": true,
+      "shouldUpdateLastCheckInDate": true
+    }
+  },
+  {
+    "id": "user-outcome-same-day",
+    "description": "Already checked in today (2am): no streak update at noon",
+    "scenario": "user-outcome",
+    "subtype": "user-outcome",
+    "input": {
+      "user": {
+        "id": "u1",
+        "totalCheckIns": 5,
+        "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0,
+        "reactionsGiven": 0,
+        "reactionsReceived": 0,
+        "comebackCount": 0,
+        "earnedAwardTypes": [],
+        "currentStreak": 5,
+        "longestStreak": 5,
+        "lastCheckInDateSeconds": 1739930400,
+        "timezone": "UTC"
+      },
+      "completionTimestampSeconds": 1739966400,
+      "tzIdentifier": "UTC",
+      "nowSeconds": 1739923200
+    },
+    "expected": {
+      "currentStreak": 5,
+      "longestStreak": 5,
+      "isComeback": false,
+      "shouldUpdateLastCheckInDate": false
+    }
+  },
+  {
+    "id": "user-outcome-2day-gap",
+    "description": "Last check-in 2 days ago (not ≥3): reset streak, not a comeback",
+    "scenario": "user-outcome",
+    "subtype": "user-outcome",
+    "input": {
+      "user": {
+        "id": "u1",
+        "totalCheckIns": 3,
+        "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0,
+        "reactionsGiven": 0,
+        "reactionsReceived": 0,
+        "comebackCount": 0,
+        "earnedAwardTypes": [],
+        "currentStreak": 3,
+        "longestStreak": 5,
+        "lastCheckInDateSeconds": 1739793600,
+        "timezone": "UTC"
+      },
+      "completionTimestampSeconds": 1739966400,
+      "tzIdentifier": "UTC",
+      "nowSeconds": 1739923200
+    },
+    "expected": {
+      "currentStreak": 1,
+      "longestStreak": 5,
+      "isComeback": false,
+      "shouldUpdateLastCheckInDate": true
+    }
+  }
+]

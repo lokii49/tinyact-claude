@@ -1,0 +1,336 @@
+[
+  {
+    "id": "firstStep-granted",
+    "description": "First check-in ever grants firstStep",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 1, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": [], "currentStreak": 1,
+        "longestStreak": 1, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 1, "completionHour": 12, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": true
+    },
+    "expected": { "awardTypes": ["firstStep"] }
+  },
+  {
+    "id": "weeklyWarrior-granted",
+    "description": "Streak of 7 grants weeklyWarrior and perfectWeek",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 7, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": ["firstStep"], "currentStreak": 7,
+        "longestStreak": 7, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 7, "completionHour": 12, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": ["weeklyWarrior", "perfectWeek"] }
+  },
+  {
+    "id": "weeklyWarrior-not-yet",
+    "description": "Streak of 6 does not grant weeklyWarrior",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 6, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": ["firstStep"], "currentStreak": 6,
+        "longestStreak": 6, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 6, "completionHour": 12, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": [] }
+  },
+  {
+    "id": "habitFormed-granted",
+    "description": "Streak of 21 grants habitFormed",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 21, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0,
+        "earnedAwardTypes": ["firstStep", "weeklyWarrior", "perfectWeek"],
+        "currentStreak": 21, "longestStreak": 21, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 21, "completionHour": 12, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": ["habitFormed"] }
+  },
+  {
+    "id": "monthlyMaster-granted",
+    "description": "Streak of 30 grants monthlyMaster and perfectMonth",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 30, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0,
+        "earnedAwardTypes": ["firstStep", "weeklyWarrior", "habitFormed", "perfectWeek"],
+        "currentStreak": 30, "longestStreak": 30, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 30, "completionHour": 12, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": ["monthlyMaster", "perfectMonth"] }
+  },
+  {
+    "id": "centuryClub-granted",
+    "description": "Streak of 100 grants centuryClub",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 100, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0,
+        "earnedAwardTypes": ["firstStep", "weeklyWarrior", "habitFormed", "monthlyMaster", "perfectWeek", "perfectMonth"],
+        "currentStreak": 100, "longestStreak": 100, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 100, "completionHour": 12, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": ["centuryClub"] }
+  },
+  {
+    "id": "earlyBird-granted",
+    "description": "Check-in at hour 6 with 7+ total check-ins grants earlyBird",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 7, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": ["firstStep", "weeklyWarrior", "perfectWeek"],
+        "currentStreak": 7, "longestStreak": 7, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 7, "completionHour": 6, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": ["earlyBird"] }
+  },
+  {
+    "id": "earlyBird-wrong-hour",
+    "description": "Check-in at hour 7 (not <7) does not grant earlyBird",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 7, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": ["firstStep", "weeklyWarrior", "perfectWeek"],
+        "currentStreak": 7, "longestStreak": 7, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 7, "completionHour": 7, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": [] }
+  },
+  {
+    "id": "earlyBird-insufficient-checkins",
+    "description": "Hour 6 but only 6 total check-ins does not grant earlyBird",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 6, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": ["firstStep"],
+        "currentStreak": 6, "longestStreak": 6, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 6, "completionHour": 6, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": [] }
+  },
+  {
+    "id": "nightOwl-granted",
+    "description": "Check-in at hour 21 with 7+ check-ins grants nightOwl",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 7, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": ["firstStep", "weeklyWarrior", "perfectWeek"],
+        "currentStreak": 7, "longestStreak": 7, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 7, "completionHour": 21, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": ["nightOwl"] }
+  },
+  {
+    "id": "nightOwl-wrong-hour",
+    "description": "Check-in at hour 20 does not grant nightOwl",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 7, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": ["firstStep", "weeklyWarrior", "perfectWeek"],
+        "currentStreak": 7, "longestStreak": 7, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 7, "completionHour": 20, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": [] }
+  },
+  {
+    "id": "phoenixRising-granted",
+    "description": "Comeback with prior check-ins grants phoenixRising",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 11, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 1, "earnedAwardTypes": ["firstStep"],
+        "currentStreak": 1, "longestStreak": 7, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 1, "completionHour": 12, "groupID": "solo",
+      "isComeback": true, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": ["phoenixRising"] }
+  },
+  {
+    "id": "phoenixRising-first-checkin",
+    "description": "isFirstCheckInEver=true prevents phoenixRising even if isComeback=true",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 1, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": [],
+        "currentStreak": 1, "longestStreak": 1, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 1, "completionHour": 12, "groupID": "solo",
+      "isComeback": true, "isFirstCheckInEver": true
+    },
+    "expected": { "awardTypes": ["firstStep"] }
+  },
+  {
+    "id": "secondWind-granted",
+    "description": "comebackCount=2 grants secondWind",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 15, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 2, "earnedAwardTypes": ["firstStep", "phoenixRising"],
+        "currentStreak": 1, "longestStreak": 7, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 1, "completionHour": 12, "groupID": "solo",
+      "isComeback": true, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": ["secondWind"] }
+  },
+  {
+    "id": "neverGiveUp-granted",
+    "description": "comebackCount=5 grants neverGiveUp",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 25, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 5, "earnedAwardTypes": ["firstStep", "phoenixRising", "secondWind"],
+        "currentStreak": 1, "longestStreak": 7, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 1, "completionHour": 12, "groupID": "solo",
+      "isComeback": true, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": ["neverGiveUp"] }
+  },
+  {
+    "id": "teamPlayer-granted",
+    "description": "Non-solo groupID grants teamPlayer",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 5, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": ["firstStep"],
+        "currentStreak": 5, "longestStreak": 5, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 1, "completionHour": 12, "groupID": "group-abc",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": ["teamPlayer"] }
+  },
+  {
+    "id": "photographer-granted",
+    "description": "10 photo proofs grants photographer",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 10, "totalPhotoProofs": 10,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": ["firstStep"],
+        "currentStreak": 10, "longestStreak": 10, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 1, "completionHour": 12, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": ["photographer"] }
+  },
+  {
+    "id": "photographer-not-yet",
+    "description": "9 photo proofs does not grant photographer",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 10, "totalPhotoProofs": 9,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": ["firstStep"],
+        "currentStreak": 10, "longestStreak": 10, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 1, "completionHour": 12, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": [] }
+  },
+  {
+    "id": "honestAbe-granted",
+    "description": "30 honor check-ins grants honestAbe",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 30, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 30, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": ["firstStep"],
+        "currentStreak": 30, "longestStreak": 30, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 1, "completionHour": 12, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": ["honestAbe"] }
+  },
+  {
+    "id": "honestAbe-not-yet",
+    "description": "29 honor check-ins does not grant honestAbe",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 29, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 29, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": ["firstStep"],
+        "currentStreak": 29, "longestStreak": 29, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 1, "completionHour": 12, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": [] }
+  },
+  {
+    "id": "duplicate-guard",
+    "description": "Award already earned is not re-granted",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 7, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0,
+        "earnedAwardTypes": ["firstStep", "weeklyWarrior", "perfectWeek"],
+        "currentStreak": 7, "longestStreak": 7, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 7, "completionHour": 12, "groupID": "solo",
+      "isComeback": false, "isFirstCheckInEver": false
+    },
+    "expected": { "awardTypes": [] }
+  },
+  {
+    "id": "multiple-awards",
+    "description": "First check-in in a group grants firstStep and teamPlayer together",
+    "input": {
+      "user": {
+        "id": "u1", "totalCheckIns": 1, "totalPhotoProofs": 0,
+        "totalHonorCheckIns": 0, "reactionsGiven": 0, "reactionsReceived": 0,
+        "comebackCount": 0, "earnedAwardTypes": [],
+        "currentStreak": 1, "longestStreak": 1, "lastCheckInDateSeconds": null, "timezone": "UTC"
+      },
+      "streakNow": 1, "completionHour": 12, "groupID": "group-xyz",
+      "isComeback": false, "isFirstCheckInEver": true
+    },
+    "expected": { "awardTypes": ["firstStep", "teamPlayer"] }
+  }
+]

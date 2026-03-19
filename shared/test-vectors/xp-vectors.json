@@ -1,0 +1,135 @@
+[
+  {
+    "id": "level-0",
+    "description": "levelFromXP(0) = Starter",
+    "function": "levelFromXP",
+    "input": { "xp": 0 },
+    "expected": { "result": "Starter" }
+  },
+  {
+    "id": "level-49",
+    "description": "levelFromXP(49) = Starter",
+    "function": "levelFromXP",
+    "input": { "xp": 49 },
+    "expected": { "result": "Starter" }
+  },
+  {
+    "id": "level-50",
+    "description": "levelFromXP(50) = Committed",
+    "function": "levelFromXP",
+    "input": { "xp": 50 },
+    "expected": { "result": "Committed" }
+  },
+  {
+    "id": "level-149",
+    "description": "levelFromXP(149) = Committed",
+    "function": "levelFromXP",
+    "input": { "xp": 149 },
+    "expected": { "result": "Committed" }
+  },
+  {
+    "id": "level-150",
+    "description": "levelFromXP(150) = Dedicated",
+    "function": "levelFromXP",
+    "input": { "xp": 150 },
+    "expected": { "result": "Dedicated" }
+  },
+  {
+    "id": "level-349",
+    "description": "levelFromXP(349) = Dedicated",
+    "function": "levelFromXP",
+    "input": { "xp": 349 },
+    "expected": { "result": "Dedicated" }
+  },
+  {
+    "id": "level-350",
+    "description": "levelFromXP(350) = Master",
+    "function": "levelFromXP",
+    "input": { "xp": 350 },
+    "expected": { "result": "Master" }
+  },
+  {
+    "id": "level-699",
+    "description": "levelFromXP(699) = Master",
+    "function": "levelFromXP",
+    "input": { "xp": 699 },
+    "expected": { "result": "Master" }
+  },
+  {
+    "id": "level-700",
+    "description": "levelFromXP(700) = Legend",
+    "function": "levelFromXP",
+    "input": { "xp": 700 },
+    "expected": { "result": "Legend" }
+  },
+  {
+    "id": "level-1000",
+    "description": "levelFromXP(1000) = Legend",
+    "function": "levelFromXP",
+    "input": { "xp": 1000 },
+    "expected": { "result": "Legend" }
+  },
+  {
+    "id": "progress-0",
+    "description": "progressToNextLevel(0) = 0.0",
+    "function": "progressToNextLevel",
+    "input": { "xp": 0 },
+    "expected": { "result": 0.0 }
+  },
+  {
+    "id": "progress-25",
+    "description": "progressToNextLevel(25) = 0.5",
+    "function": "progressToNextLevel",
+    "input": { "xp": 25 },
+    "expected": { "result": 0.5 }
+  },
+  {
+    "id": "progress-50",
+    "description": "progressToNextLevel(50) = 0.0 (start of Committed)",
+    "function": "progressToNextLevel",
+    "input": { "xp": 50 },
+    "expected": { "result": 0.0 }
+  },
+  {
+    "id": "progress-100",
+    "description": "progressToNextLevel(100) = 0.5 (halfway through Committed)",
+    "function": "progressToNextLevel",
+    "input": { "xp": 100 },
+    "expected": { "result": 0.5 }
+  },
+  {
+    "id": "progress-700",
+    "description": "progressToNextLevel(700) = 1.0 (Legend, max)",
+    "function": "progressToNextLevel",
+    "input": { "xp": 700 },
+    "expected": { "result": 1.0 }
+  },
+  {
+    "id": "xpToNext-0",
+    "description": "xpToNextLevel(0) = 50",
+    "function": "xpToNextLevel",
+    "input": { "xp": 0 },
+    "expected": { "result": 50 }
+  },
+  {
+    "id": "xpToNext-49",
+    "description": "xpToNextLevel(49) = 1",
+    "function": "xpToNextLevel",
+    "input": { "xp": 49 },
+    "expected": { "result": 1 }
+  },
+  {
+    "id": "xpToNext-50",
+    "description": "xpToNextLevel(50) = 100",
+    "function": "xpToNextLevel",
+    "input": { "xp": 50 },
+    "expected": { "result": 100 }
+  },
+  {
+    "id": "xpToNext-700",
+    "description": "xpToNextLevel(700) = 0 (Legend, no next level)",
+    "function": "xpToNextLevel",
+    "input": { "xp": 700 },
+    "expected": { "result": 0 }
+  }
+]

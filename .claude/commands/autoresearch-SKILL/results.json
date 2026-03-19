@@ -1,0 +1,49 @@
+{
+  "skill_name": "SKILL (TinyAct Navigation Guide)",
+  "status": "complete",
+  "current_experiment": 3,
+  "baseline_score": 83.3,
+  "best_score": 100.0,
+  "experiments": [
+    {
+      "id": 0,
+      "score": 25,
+      "max_score": 30,
+      "pass_rate": 83.3,
+      "status": "baseline",
+      "description": "original skill — no changes"
+    },
+    {
+      "id": 1,
+      "score": 29,
+      "max_score": 30,
+      "pass_rate": 96.7,
+      "status": "keep",
+      "description": "added iOS Invitations + Android Notifications/Partnership screens"
+    },
+    {
+      "id": 2,
+      "score": 30,
+      "max_score": 30,
+      "pass_rate": 100.0,
+      "status": "keep",
+      "description": "named Firebase function entry points"
+    },
+    {
+      "id": 3,
+      "score": 30,
+      "max_score": 30,
+      "pass_rate": 100.0,
+      "status": "keep",
+      "description": "fixed wrong iOS Goals path Goals/ → MyGoals/"
+    }
+  ],
+  "eval_breakdown": [
+    {"name": "Correct file path (no search needed)", "pass_count": 5, "total": 5},
+    {"name": "Correct platform identified", "pass_count": 5, "total": 5},
+    {"name": "Right layer referenced", "pass_count": 5, "total": 5},
+    {"name": "Algorithm protocol when streak involved", "pass_count": 5, "total": 5},
+    {"name": "Avoids broad glob/search", "pass_count": 5, "total": 5},
+    {"name": "Specific enough to open right file first try", "pass_count": 5, "total": 5}
+  ]
+}

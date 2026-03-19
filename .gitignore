@@ -1,0 +1,10 @@
+# Project repos (already in their own GitHub repos)
+microcommit/
+TinyAct---Android/
+
+# Sensitive local settings
+.claude/settings.local.json
+
+# macOS
+.DS_Store
+**/.DS_Store
