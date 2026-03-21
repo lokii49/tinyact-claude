@@ -41,7 +41,28 @@ Both platforms handle `microcommit://` URL scheme for push notification deep lin
 ### Rule 8: FCM token saved on login
 After successful sign-in, the FCM token from `FirebaseMessaging.getInstance().token` (Android) or `Messaging.messaging().token` (iOS) must be saved to the user's Firestore document under the `fcmToken` field. If this step is skipped, server-side push notifications will not reach the device.
 
-### Rule 9: Username is the primary login identifier
+### Rule 9: Delete account flow must follow the full deletion protocol
+The delete account flow must follow this exact sequence on both platforms:
+
+1. **Deletion flow**: User clicks "Delete Account" → re-authentication prompt → on successful re-auth → show loading screen → delete account → land on social login screen.
+2. **Confirmation alert**: Show an alert when the user clicks the delete account button with a clear, appropriate message (e.g., "This will permanently delete your account and all associated data. This action cannot be undone.").
+3. **Admin transfer for group commitments**: For all group commitments where this user is admin/creator, transfer admin privileges to another member in the group and silently exit from the group. This must not impact existing members' streak data with those groups. If the user is the sole member, delete the group entirely.
+4. **Silent exit for regular members**: If this user is just a member (not admin), silently exit the group without notifying other members.
+5. **End partnership before exit**: If the user is a partnered member (has an accountability partner), end the partnership first and then exit the group. Both sides of the accountability pair must be removed.
+6. **Permanent data deletion from Firebase**: All user data must be deleted permanently from Firebase, including:
+   - User document from `users` collection
+   - All completions and their proof photos from Firebase Storage
+   - All commitments
+   - All streaks the user participates in
+   - All group invitations (sent and received)
+   - All partnership invitations (sent and received)
+   - Group removal notifications
+   - Username mapping (Android: `usernames` collection)
+   - Avatar images from Firebase Storage
+   - Firebase Auth account itself
+   - Local caches (SwiftData/Room), sync engine state, widget data, and pending notifications
+
+### Rule 10: Username is the primary login identifier
 Per `User.swift`, `username` is the PRIMARY field used for login and adding users to groups. Email is optional and used only for verification. Authentication uses Firebase Auth (email/password or Google), but in-app user lookup/display uses `username`.
 
 ## Audit steps
@@ -66,6 +87,26 @@ Per `User.swift`, `username` is the PRIMARY field used for login and adding user
 
 7. Verify no ViewModel imports `FirebaseAuth` directly on iOS; all auth must go through `AuthenticationService`.
 
+8. Read `/Users/lokeshpudhari/TinyAct/microcommit/micro-commit/Infrastructure/Services/AccountDeletionService.swift` and verify:
+   - Admin transfer logic for group commitments where user is creator
+   - Partnership pairs are cleaned up (both sides removed)
+   - All user data collections are deleted (completions, commitments, streaks, invitations, notifications, user doc)
+   - Storage files (proofs, avatars) are deleted
+   - Batched writes are used for atomic deletion
+
+9. Read `/Users/lokeshpudhari/TinyAct/TinyAct---Android/core/data/src/main/java/com/lokesh/tinyact/core/data/repository/FirebaseAuthRepository.kt` `deleteAccount()` method and verify:
+   - Admin transfer logic matches iOS
+   - Partnership cleanup removes both sides of the pair
+   - All Firestore collections are cleaned up
+   - Storage folders (proofs, avatars) are deleted
+   - Firebase Auth account is deleted after Firestore cleanup
+
+10. Read SettingsView.swift (iOS) and SettingsScreen.kt (Android) and verify:
+    - Confirmation alert is shown before deletion
+    - Re-authentication is required
+    - Loading screen is displayed during deletion
+    - User is navigated to social login screen after successful deletion
+
 ## Common violations to fix
 
 - **Error code 10 on Android Google Sign-In**: Go to Firebase Console > Project Settings > Your Android app > Add SHA-1 fingerprint. Run `./gradlew signingReport` to get debug SHA-1. Download new `google-services.json` and replace the existing file.
@@ -78,11 +119,16 @@ Per `User.swift`, `username` is the PRIMARY field used for login and adding user
 
 - iOS:
   - `/Users/lokeshpudhari/TinyAct/microcommit/micro-commit/Infrastructure/Services/AuthenticationService.swift`
+  - `/Users/lokeshpudhari/TinyAct/microcommit/micro-commit/Infrastructure/Services/AccountDeletionService.swift`
   - `/Users/lokeshpudhari/TinyAct/microcommit/micro-commit/Infrastructure/Services/DeepLinkHandler.swift`
+  - `/Users/lokeshpudhari/TinyAct/microcommit/micro-commit/Core/Presentation/Screens/Settings/SettingsView.swift`
+  - `/Users/lokeshpudhari/TinyAct/microcommit/micro-commit/Core/Presentation/Screens/Settings/SettingsViewModel.swift`
   - `/Users/lokeshpudhari/TinyAct/microcommit/micro-commit/GoogleService-Info.plist`
   - `Info.plist` under `microcommit/micro-commit/`
 - Android:
   - `/Users/lokeshpudhari/TinyAct/TinyAct---Android/core/data/src/main/java/com/lokesh/tinyact/core/data/repository/FirebaseAuthRepository.kt`
+  - `/Users/lokeshpudhari/TinyAct/TinyAct---Android/feature/settings/src/main/java/com/lokesh/tinyact/feature/settings/SettingsScreen.kt`
+  - `/Users/lokeshpudhari/TinyAct/TinyAct---Android/feature/settings/src/main/java/com/lokesh/tinyact/feature/settings/SettingsViewModel.kt`
   - `/Users/lokeshpudhari/TinyAct/TinyAct---Android/app/google-services.json`
   - `/Users/lokeshpudhari/TinyAct/TinyAct---Android/app/src/main/AndroidManifest.xml`
   - `/Users/lokeshpudhari/TinyAct/TinyAct---Android/feature/auth/` (auth feature screens/ViewModels)
