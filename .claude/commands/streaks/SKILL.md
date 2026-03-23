@@ -103,13 +103,30 @@ Verified scenario — 1-day pause:
 - Expected display (not paused): **4** (days 1+2+4+5 all counted; day 3 skipped as paused)
 - Wrong if paused days NOT skipped: 2 (only days 4+5 counted, streak breaks at day 3) ← this is the bug to avoid
 
+Verified scenario — check-in during pause with auto-resume:
+- Day 1: both check-in (streak=1), Day 2: both check-in (streak=2)
+- Day 3: paused → display shows frozen value (2). User A checks in during pause (partner B does not).
+- Day 4: auto-resume + both check-in
+- Expected display on ALL views: **3** (days 1+2+4; day 3 skipped as paused, User A's solo check-in during pause does NOT count in partnership streak)
+- Wrong if Detail view uses individual streak: **4** (counts User A's day 3 check-in because individual calc sees it as a completion day) ← this is the bug to avoid
+- **Root cause of past regression:** iOS `GroupDetailView.streakCountLabel` fell back to `individualStreak` for ALL non-paused cases instead of using `partnershipStreak` when a partner exists. The fix: when `currentAccountabilityPartner != nil`, always use `partnershipStreak` (intersection-based); only fall back to `individualStreak` when no partnership exists.
+
 **Mutual break rule:**
 If either partner misses a day, the streak shows 0 immediately via `calculatePartnershipStreak` (intersection returns empty for that day). Additionally, when both partners next check in together and a gap is detected, `lastStreakBreakDate = today` is set on **both** users' commitment documents. This ensures the CheckIn screen (which uses individual `calculateStreak` filtered by `lastStreakBreakDate`) also resets to 0. When both partners resume checking in, streak continues to build from 1.
 
-**Partnership formation rule:**
-Forming a partnership does NOT reset either user's streak. Both users continue showing their pre-partnership individual counts. From partnership formation onward, both must check in for either's streak to grow; if either breaks, both reset to 0.
+**Partnership formation rule (intersection behavior):**
+Forming a partnership switches the displayed streak from individual to **intersection-based** (`calculatePartnershipStreak`). The streak becomes the count of consecutive days (ending today/yesterday) where **both** users checked in. This typically **lowers** one or both users' displayed streaks, since pre-partnership check-in days may not overlap.
+- Both platforms show a **streak warning alert** when the user has an active streak and taps "Invite": *"You currently have a N day streak. Once partnered, your streak will be based on days you both checked in. This may lower your displayed streak."*
 - iOS: partnership streak doc is created only on the first day both check in together (with `currentStreak: 1`, `lastCompletionDate: today`)
 - Android: partnership streak doc is created immediately on invitation acceptance (with `currentStreak: 0`, `lastCompletionDate: null`); the first mutual check-in is treated as `lastDay == null` (not a gap) and only updates `lastCompletionDate`
+
+Verified scenario — partnership formation with different streaks:
+- Pre-partnership: A has streak 2 (checked Day 2,3), B has streak 1 (checked Day 3 only)
+- Day 4 — A and B partner (before anyone checks in):
+  - Intersection of completions: {Day 3} only (both checked Day 3, but only A checked Day 2)
+  - All views show **1** for both A and B (intersection-based)
+- Day 4 — both check in: intersection now includes Day 3+4 → streak = **2** for both
+- If only A checks in Day 4: intersection for Day 4 is empty → streak = **0** for both
 
 **Partnership dissolution rule:**
 When a partnership is ended, both users continue individually with their current streak from that point onward. Each user's streak then depends solely on their own check-ins.
@@ -124,14 +141,14 @@ If an un-partnered member leaves/is removed, there is no impact on other users' 
 - **Extend**: streak continues based on check-ins done by partner members, nothing resets.
 
 **Verified scenario — day 6 partnership formation in a 14-day group:**
-- Pre-partnership: A has 5-day streak, B has 2-day streak
-- Right after partnering (before day 6 check-in): A sees 5, B sees 2 ✓
-- Day 6 — both check in: A sees 6, B sees 3 (each gained one day, no reset) ✓
-- Day 7+ — both check in daily: A=7/B=4, A=8/B=5, etc. (streaks grow independently) ✓
-- If B misses day 8, then on day 9 both check in: gap detected → `lastStreakBreakDate = day9` on both → A resets to 1, B resets to 1 ✓
+- Pre-partnership: A has 5-day streak (checked days 1-5), B has 2-day streak (checked days 4-5)
+- Right after partnering (before day 6 check-in): intersection = {Day 4, Day 5} → both see **2** (intersection-based)
+- Day 6 — both check in: intersection = {Day 4, 5, 6} → both see **3** ✓
+- Day 7+ — both check in daily: both=4, both=5, etc. (streaks grow together) ✓
+- If B misses day 8, then on day 9 both check in: gap detected → `lastStreakBreakDate = day9` on both → both reset to 1 ✓
 
 **Key implementation files:**
-- iOS display: `GroupDetailView.swift` → `calculatePartnershipStreakDisplay()` calls `calculatePartnershipStreak(userCompletions, partnerCompletions, pausedDays)` — intersection-based, immediate break visibility
+- iOS display: `GroupDetailView.swift` → `streakCountLabel` uses `partnershipStreak` (intersection-based) when partner exists, `partnershipStreakObject.currentStreak` when paused, `individualStreak` only when no partnership. ViewModel's `calculatePartnershipStreak()` computes the intersection value.
 - iOS check-in display: `CheckInViewModel.swift` → `getStreakDays` (returns `streaks[commitment.id]`, individual with `lastStreakBreakDate` filter)
 - iOS break enforcement: `CheckInViewModel.swift` → `updatePartnershipStreakAfterCheckIn` → `updateCommitmentsWithStreakBreak`
 - Android display: `CommitmentDetailViewModel.kt` → `displayStreakDays` calls `calculatePartnershipStreak(userCompletions, partnerCompletions, pPausedDays)` — intersection-based, immediate break visibility. `MyGoalsViewModel.kt` → same approach.
@@ -269,6 +286,7 @@ User streak calculation logic for views: Calculate user streak for each commitme
 - **Streak resetting after pause/resume (NOT skipping paused days)**: `calculateIndividualStreak` or `personalStreakDays` MUST receive paused days so the walk-back skips the pause period and continues counting pre-pause completions. If paused days are not passed, the streak breaks at the pause boundary and only counts post-resume check-ins, showing a lower count than expected. Fix: pass paused days so the streak continues from the frozen value after resume.
 - **Partnership streak not resetting both users**: Ensure the partnership streak update function sets `lastStreakBreakDate = today` on both users' commitment documents when a gap is detected. iOS: `updateCommitmentsWithStreakBreak` in `CheckInViewModel.swift`. Android: `else` branch of `updatePartnershipStreakInFirestore` in `CheckInViewModel.kt`.
 - **Partnership display not using intersection**: MyGoals and Detail screens must use `calculatePartnershipStreak(userCompletions, partnerCompletions, pausedDays)` for non-paused partnerships — this gives immediate visibility when a partner misses (shows 0 the next day without waiting for anyone to check in). Only `isPaused == true` should show the stored `partnershipStreak.currentStreak`. Never use individual `calculateStreak` for partnership display on these screens — that only resets after `lastStreakBreakDate` is set at the next check-in.
+- **Detail view falling back to individualStreak when partner exists (recurring regression)**: iOS `GroupDetailView.streakCountLabel` must check `currentAccountabilityPartner != nil` and use `partnershipStreak` (intersection-based) — NOT `individualStreak`. The `individualStreak` fallback is only for commitments with NO partnership. Using individual streak for partnered commitments causes check-ins during pause to be counted (since the individual calc sees them as valid completions), inflating the streak after auto-resume. Fix: add `if viewModel.currentAccountabilityPartner != nil { return viewModel.partnershipStreak }` before the `individualStreak` fallback.
 - **Partnership formation resetting existing streaks**: `FirebaseInvitationRepository.kt` must initialize with `currentStreak=0`, not `min(A, B)`. iOS `updatePartnershipStreakAfterCheckIn` must initialize with `currentStreak: 1`, not `min(...)`. First mutual check-in (`lastCompletionDate == null`) must NOT trigger a break.
 - **CheckIn screen not using partnership streak**: All screens (CheckIn, MyGoals, Detail) must use `calculatePartnershipStreak` for partnership commitments so streak values are consistent. Android `buildPerCommitmentStreaks` must call `calculatePartnershipStreak(filteredUserComps, filteredPartnerComps, pausedDays)`. iOS `getStreakDays` must return `partnershipStreaks[commitment.id]` when a partner exists.
 - **Partnership dissolution not preserving streak**: When partnership ends, both users must keep their current streak value and continue individually. Fix: do not reset streak on partnership dissolution.
