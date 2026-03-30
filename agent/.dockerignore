@@ -1,0 +1,6 @@
+agent_logs/
+__pycache__/
+*.pyc
+.env
+deploy.sh
+setup_cloud_scheduler.sh
