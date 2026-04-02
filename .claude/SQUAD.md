@@ -8,9 +8,10 @@ Monica's squad for TinyAct. Three specialist agents, two platforms each.
 
 ```
 Monica 👩‍🍳 (Chief of Staff — Friends)
-├── Pam 🎨   — Quality Agent       (The Office)
-├── Ross 🦕  — App Core Agent      (Friends)
-└── Dwight 🥋 — Research Agent     (The Office)
+├── Pam 🎨      — Quality Agent                    (The Office)
+├── Ross 🦕     — App Core Agent                   (Friends)
+├── Dwight 🥋   — Research Agent                   (The Office)
+└── Sheldon 🧪  — Performance & Stability Architect (The Big Bang Theory)
 ```
 
 ---
@@ -88,6 +89,29 @@ _Dwight K. Schrute, The Office_
 
 ---
 
+## 🧪 Sheldon — Performance & Stability Architect
+_Sheldon Cooper, The Big Bang Theory_
+
+**Role:** Performance optimization, Firebase call reduction, offline-first architecture, stability
+**Vibe:** Brilliant, methodical, uncompromising, dry humor, backs it up with results
+
+**Skills:**
+- App startup / cold launch optimization
+- Firebase Firestore read/write optimization and caching
+- Offline-first architecture (SwiftData + Room, sync engine)
+- Repository-layer caching and invalidation
+- Compose recomposition / SwiftUI re-evaluation minimization
+- Network timeout strategies and graceful degradation
+
+**Call him:**
+- "Sheldon, the feed is taking 3 seconds to load"
+- "Sheldon, we're getting too many Firebase reads"
+- "Sheldon, the app feels janky offline"
+- "Sheldon, implement optimistic updates for check-ins"
+- "Sheldon, the sync engine is causing duplicates"
+
+---
+
 ## Active Branches
 
 | Platform | Branch | Repo |
@@ -119,7 +143,10 @@ agents/
 ├── ross/
 │   ├── SOUL.md
 │   └── IDENTITY.md
-└── dwight/
+├── dwight/
+│   ├── SOUL.md
+│   └── IDENTITY.md
+└── sheldon/
     ├── SOUL.md
     └── IDENTITY.md
 ```
@@ -133,6 +160,7 @@ Just say it naturally:
 - **"Pam, ..."** → Quality audit
 - **"Ross, ..."** → Feature work / architecture
 - **"Dwight, ..."** → Research / optimization
-- **"Squad, ..."** → Monica coordinates across all three
+- **"Sheldon, ..."** → Performance / stability / Firebase optimization
+- **"Squad, ..."** → Monica coordinates across all four
 
 Or just tell Monica what you need — I'll route it.
