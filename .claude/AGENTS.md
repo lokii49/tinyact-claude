@@ -20,6 +20,7 @@ Before doing anything else:
    - `context/streak-rules.md` — streak algorithm quick-ref
    - `context/notification-system.md` — smart notification overview
    - `context/project-status.md` — active branches, known bugs, active work
+6. Check `.claude/raw/` — if any unprocessed files exist, flag to Lokesh or route to Dwight
 
 Don't ask permission. Just do it.
 
@@ -84,6 +85,43 @@ This workspace uses a multi-agent squad. See `SQUAD.md` for the full structure.
 - **Pam** 🎨 — Quality Agent (`agents/pam/`)
 - **Ross** 🦕 — App Core Agent (`agents/ross/`)
 - **Dwight** 🥋 — Research Agent (`agents/dwight/`)
+
+## Wiki Maintenance — The Karpathy Loop
+
+The `.claude/context/` docs are the living wiki. They compound with every session — but only if Monica writes to them.
+
+**Rule: at the end of every significant task, before closing your response, ask:**
+> *"Did I learn something non-obvious that isn't already in the context docs?"*
+
+If yes — write it immediately. Don't save it to memory. Put it in the right context doc.
+
+### Routing
+
+| What was learned | Write to |
+|---|---|
+| New/changed model field or behavior | `context/domain-models.md` |
+| New Firestore collection or schema change | `context/firebase-schema.md` |
+| Notification edge case or behavior | `context/notification-system.md` |
+| Feature shipped, bug confirmed, branch status | `context/project-status.md` |
+| Streak edge case, pause/resume rule | `context/streak-rules.md` |
+
+### What triggers a wiki write
+
+- Ross fixes a bug that revealed an undocumented edge case
+- Pam's audit confirms a parity difference
+- Dwight's research clarifies how something actually works
+- Any session where a model field, schema detail, or rule was discovered that wasn't already documented
+
+### What does NOT go in the wiki
+
+- Things already derivable from reading the code
+- Git history or who changed what
+- Ephemeral task state (in-progress work, temp notes)
+- Personal preferences → those go in `MEMORY.md`
+
+The wiki writes itself. You just steer.
+
+---
 
 ## Make It Yours
 

@@ -1,0 +1,6 @@
+- [Cold-Start Data Flash — Root Cause & Fix](project_cold_start_flash.md) — MyGoalsViewModel + FeedViewModel skeleton/empty-state flash on every launch, fixed 2026-04-01
+- [CommitmentDetailScreen derived-field flash](project_commitment_detail_flash.md) — Stage 1b missing remainingDays/totalDays/progress, causing zeroed stats flash on detail screen, fixed 2026-04-01
+- [Navigation Transitions — Full Audit & Fix](project_navigation_transitions.md) — All detail screens slide, tab roots fade; 6 nav files updated, fixed 2026-04-01
+- [Encrypted Image Cache — Layered Strategy](project_encrypted_image_cache.md) — EncryptedImageFetcher now uses 3-layer cache (memory→disk→network); Coil at 25% heap + respectCacheHeaders(false), fixed 2026-04-01
+- [Android Performance Audit 2026-04-02](project_android_perf_audit.md) — Full audit of Firebase reads, Room cache, Compose recomposition, sync engine, memory
+- [Android Perf Fixes 2026-04-03](project_perf_fixes_2026_04_03.md) — Issues 1/2/6 fixed: progress nullable gate, Lazy DI, cold launch non-blocking, Room indexes, bulk queue delete
