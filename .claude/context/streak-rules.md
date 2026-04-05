@@ -38,9 +38,12 @@ This is a quick-reference summary.
 
 **Day Key:** `year * 10000 + dayOfYear` (1-indexed, user's local IANA timezone)
 
-**Grace period:** `gracePeriodHours` on the Commitment — window after midnight before a streak is considered broken. User can still check in during grace period and it counts for the previous day.
+**Grace period:** The doc `algorithm-spec.md` references `gracePeriodHours`. The live `StreakCalculationService` implementations on both platforms do **not** implement a grace period — any missed day breaks the streak immediately at midnight (no mercy days). If grace period logic is reintroduced, both service files must be updated together.
 
 **Pause/Resume:** Complex — see `algorithm-spec.md` section on pause logic. Paused days are not counted as misses.
+
+<!-- GAP: investigate -->
+**Group accountability streak pause support:** `calculateGroupAccountabilityStreak` on iOS takes no `pausedDays` parameter — group accountability streaks cannot be paused. Android's `calculateGroupAccountabilityStreak` accepts a `pausedDays` parameter. This is a parity gap. Verify intended behavior and align both implementations.
 
 **Implementation files:**
 - iOS: `Infrastructure/Services/StreakCalculationService.swift`

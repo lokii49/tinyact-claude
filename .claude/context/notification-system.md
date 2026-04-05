@@ -44,8 +44,11 @@ Agent code: `agent/notification_agent.py`
 
 ## Architecture
 
-- **Scheduling:** client-side (iOS `NotificationScheduler.swift` / Android `SmartNotificationScheduler.kt`)
+- **Daily reminder scheduling:** client-side (iOS `PushNotificationService.swift` + `NotificationScheduler.swift` / Android `SmartNotificationScheduler.kt`). The `sendDailyReminders` Cloud Function is **disabled** — local notifications are used exclusively to avoid duplicates.
+- **Social / event notifications:** Cloud Functions only (group invites, partnership invites, streak breaks, removal, group deletion, smart nudges on completion, partner check-in momentum).
 - **Profile:** `/userNotificationProfile/{userId}` — agent writes, client reads
 - **Events:** every send/open/check-in logged to `/notificationEvents`
 - **Variants:** Firestore `/notificationVariants` — client reads, agent writes
 - **Partner notifications:** Cloud Function `onPartnerCheckIn` → FCM push
+- **Social nudge:** Cloud Function `onCompletionCreated` → sends `smart_nudge` to unchecked-in group members whose preferred time is within 2 hours; respects daily cap
+- **Opt-out monitoring:** Cloud Function `monitorOptOutRate` enforces <2% guard rail
