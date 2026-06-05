@@ -24,10 +24,15 @@ Key fields:
 Calculated, not stored raw — derived from check-ins.
 
 Key fields:
+- `id`
+- `userIDs` — array of user IDs covered by this streak (solo = 1, partnership = 2, group = all members)
 - `currentStreak` — consecutive days with valid check-ins
 - `longestStreak`
-- `totalCheckIns`
-- `lastCheckInDate`
+- `lastCompletionDateSeconds` — Unix timestamp of last check-in
+- `isPaused` — bool; paused streaks are never broken regardless of elapsed time
+- `pausedAtSeconds` — when pause started
+- `pauseResumeDateSeconds` — optional auto-resume date
+- `isBroken` — computed: `!isPaused AND lastCompletionDate != null AND lastCompletion < yesterday`
 - `streakBreakAcknowledgedAt` — user has seen/acknowledged the break
 
 Streak rules → see `Streakalgorithm.md` (product truth) and `algorithm-spec.md` (technical spec).
@@ -39,6 +44,14 @@ Streak rules → see `Streakalgorithm.md` (product truth) and `algorithm-spec.md
 - `fcmToken` — push notification token
 - `notificationOptOut` — bool
 - `xp`, `level` — awards system
+- `currentStreak`, `longestStreak` — user-level streak counters (updated after every check-in)
+- `totalCheckIns` — lifetime check-in count
+- `totalPhotoProofs` — lifetime photo proof count
+- `totalHonorCheckIns` — lifetime honor (no-photo) check-in count
+- `reactionsGiven`, `reactionsReceived` — social engagement counters
+- `comebackCount` — number of times user returned after a 3+ day gap
+- `earnedAwardTypes` — array of award type strings already earned (deduplication guard)
+- `lastCheckInDateSeconds` — Unix timestamp of last check-in
 
 ## Group
 
@@ -60,7 +73,27 @@ Streak rules → see `Streakalgorithm.md` (product truth) and `algorithm-spec.md
 
 - `id`, `userId`, `type`
 - `awardedAt`, `xpGranted`
-- Common types: `streak_7`, `streak_30`, `streak_100`, `first_checkin`, `group_streak_7`
+- Award types (see `algorithm-spec.md` §6 for full eligibility rules):
+  - Streak milestones: `firstStep`, `weeklyWarrior`, `habitFormed`, `monthlyMaster`, `centuryClub`, `yearStrong`
+  - Comeback: `phoenixRising`, `secondWind`, `neverGiveUp`
+  - Consistency: `earlyBird`, `nightOwl`, `perfectWeek`, `perfectMonth`
+  - Social: `teamPlayer`, `cheerleader`, `popular`
+  - Proof: `photographer`, `honestAbe`
+
+## XP / Level
+
+XP is accumulated via events; level is derived from total XP.
+
+Key XP events: daily check-in (+2), photo proof bonus (+1), reaction given (+1). Awards grant bonus XP.
+
+Level thresholds:
+- Starter: 0–49 XP
+- Committed: 50–149 XP
+- Dedicated: 150–349 XP
+- Master: 350–699 XP
+- Legend: 700+ XP
+
+Full XP table per award type: `algorithm-spec.md` §7.
 
 ---
 

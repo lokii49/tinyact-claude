@@ -1,6 +1,6 @@
 # Project Status — TinyAct
 
-Last updated: 2026-03-29
+Last updated: 2026-06-05
 
 ---
 

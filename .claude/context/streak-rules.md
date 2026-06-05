@@ -5,6 +5,12 @@ This is a quick-reference summary.
 
 ---
 
+## No Mercy Rule
+
+Any missed day (not paused) **immediately resets** the streak to 0. There are no grace days — the streak breaks at the start of the day after the missed day.
+
+---
+
 ## Solo Commitments
 
 - Check-in done → streak +1
@@ -31,6 +37,28 @@ This is a quick-reference summary.
 - Missed → that person's streak resets to 0
 - Member leaves/removed → zero impact on other members' streaks
 - **Renew/Extend** → same rules as Solo applied per individual
+
+---
+
+## Partnership Lifecycle
+
+- **Created mid-stream:** Each user's existing solo streak carries over. From partnership creation onwards both must check in together. If either breaks, both reset to 0.
+- **Partnership ended:** Both users continue independently from their current streak count. Each user's streak depends only on their own check-ins from that point.
+- **Partner removed:** Remaining user continues solo from current streak count.
+
+---
+
+## User-Level Streak Outcome (after every check-in)
+
+`computeUserStreakOutcome` updates `currentStreak`/`longestStreak` on the User:
+
+1. **No prior check-ins** (`lastCheckInDate == null`): `currentStreak = 1`, not a comeback.
+2. **Same day** as last check-in: no change to counters.
+3. **Consecutive day** (yesterday): `currentStreak += 1`.
+4. **Gap of 2 days**: `currentStreak = 1`, not a comeback (< 3 day gap doesn't qualify).
+5. **Gap of 3+ days** with prior check-ins: `currentStreak = 1`, `isComeback = true` → increments `comebackCount`.
+
+`longestStreak` is always `max(longestStreak, newCurrentStreak)`.
 
 ---
 

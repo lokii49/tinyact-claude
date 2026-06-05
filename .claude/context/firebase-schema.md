@@ -35,6 +35,7 @@ Deep links use `microcommit://` scheme.
 /notificationVariants/{variantId}
   triggerType, copyTitle, copyBody
   createdByAgent: bool, agentRunId
+  createdAt: Timestamp
   isActive, cohortTag
 
 /userNotificationProfile/{userId}
@@ -45,9 +46,12 @@ Deep links use `microcommit://` scheme.
 
 /agentRuns/{runId}
   runAt, hypothesis, conclusions, nextHypothesis
-  status: "running" | "complete" | "failed"
+  status: "running" | "complete" | "failed" | "skipped"
   rewardScores: { variantId -> float }
   variantsGenerated: [variantId]
+  variantsDeactivated: [variantId]
+  guardRailWarnings: [string]
+  totalEventsSent: int
 ```
 
 Full schema with all fields: `SPEC.md` section 2.
