@@ -46,9 +46,9 @@ Deep links use `microcommit://` scheme.
 
 /agentRuns/{runId}
   runAt, hypothesis, conclusions, nextHypothesis
-  status: "running" | "complete" | "failed" | "skipped"
+  status: "complete" | "skipped"  // "running" and "failed" are spec-planned (SPEC.md §2.1) but not yet written by agent code
   rewardScores: { variantId -> float }
-  variantsGenerated: [variantId]
+  variantsGenerated: [string]  // list of copyTitle strings (not IDs) — see notification_agent.py:219
   variantsDeactivated: [variantId]
   guardRailWarnings: [string]
   totalEventsSent: int

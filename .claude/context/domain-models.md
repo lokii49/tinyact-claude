@@ -33,7 +33,7 @@ Key fields:
 - `pausedAtSeconds` — when pause started
 - `pauseResumeDateSeconds` — optional auto-resume date
 - `isBroken` — computed: `!isPaused AND lastCompletionDate != null AND lastCompletion < yesterday`
-- `streakBreakAcknowledgedAt` — user has seen/acknowledged the break
+- `streakBreakAcknowledgedAt` — user has seen/acknowledged the break <!-- GAP: investigate — not present in streak-vectors.json or algorithm-spec.md; may be client-only UI state; verify against mobile implementations when available -->
 
 Streak rules → see `Streakalgorithm.md` (product truth) and `algorithm-spec.md` (technical spec).
 

@@ -67,6 +67,7 @@ Any missed day (not paused) **immediately resets** the streak to 0. There are no
 **Day Key:** `year * 10000 + dayOfYear` (1-indexed, user's local IANA timezone)
 
 **Grace period:** `gracePeriodHours` on the Commitment — window after midnight before a streak is considered broken. User can still check in during grace period and it counts for the previous day.
+<!-- GAP: investigate — algorithm-spec.md §4 says "There is no grace period — a streak breaks at the start of the day after the missed day", but the Commitment model carries gracePeriodHours. This field may be enforced by mobile client logic not captured in the canonical algorithm spec. Verify against StreakCalculationService.swift / .kt when mobile repos are available. -->
 
 **Pause/Resume:** Complex — see `algorithm-spec.md` section on pause logic. Paused days are not counted as misses.
 
