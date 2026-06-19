@@ -45,7 +45,7 @@ Agent code: `agent/notification_agent.py`
 ## Architecture
 
 - **Scheduling:** client-side (iOS `NotificationScheduler.swift` / Android `SmartNotificationScheduler.kt`)
-- **Profile:** `/userNotificationProfile/{userId}` — agent writes, client reads
+- **Profile:** `/userNotificationProfile/{userId}` — Cloud Function writes (nightly via `updateUserNotificationProfile`), client reads
 - **Events:** every send/open/check-in logged to `/notificationEvents`
 - **Variants:** Firestore `/notificationVariants` — client reads, agent writes
 - **Partner notifications:** Cloud Function `onPartnerCheckIn` → FCM push

@@ -1,6 +1,6 @@
 # Lint-Wiki Audit Report
 
-Date: 2026-06-12
+Date: 2026-06-19
 
 ---
 
@@ -9,58 +9,52 @@ Date: 2026-06-12
 | Doc | STALE | MISSING | GAP | OK |
 |---|---|---|---|---|
 | `domain-models.md` | 0 | 0 | 1 | 5 |
-| `firebase-schema.md` | 2 | 0 | 1 | 5 |
+| `firebase-schema.md` | 0 | 0 | 1 | 5 |
 | `streak-rules.md` | 0 | 0 | 1 | 7 |
-| `notification-system.md` | 0 | 0 | 0 | 7 |
-| `project-status.md` | 1 | 1 | 0 | 4 |
-| **TOTAL** | **3** | **1** | **3** | **28** |
+| `notification-system.md` | 1 | 0 | 0 | 6 |
+| `project-status.md` | 1 | 0 | 0 | 4 |
+| **TOTAL** | **2** | **0** | **3** | **27** |
 
 ---
 
 ## context/domain-models.md
 
-### GAP
+### GAP (pre-existing)
 
-- **`streakBreakAcknowledgedAt`** — Listed as a Streak field but absent from `shared/test-vectors/streak-vectors.json` and `algorithm-spec.md`. May be client-only UI state not part of the canonical algorithm. <!-- GAP: investigate --> comment added inline. Cannot verify without mobile repo.
+- **`streakBreakAcknowledgedAt`** — Listed as a Streak field but absent from `shared/test-vectors/streak-vectors.json` and `algorithm-spec.md`. May be client-only UI state not part of the canonical algorithm. `<!-- GAP: investigate -->` comment already documented inline. Cannot verify without mobile repo.
 
 ### OK (5)
 
-- Commitment key fields (id, userId, title, frequency, gracePeriodHours, groupId, partnerUserId, notificationConfig, renewedAt, extendedAt) ✓
-- User model fields (all 14 fields) — confirmed by `shared/test-vectors/streak-vectors.json` and `award-vectors.json` ✓
-- Streak model fields (id, userIDs, isPaused, pausedAtSeconds, pauseResumeDateSeconds, currentStreak, longestStreak, lastCompletionDateSeconds, isBroken formula) — confirmed by `streak-vectors.json` (streak-object scenarios) ✓
-- Award types (all 18: firstStep, weeklyWarrior, habitFormed, monthlyMaster, centuryClub, yearStrong, phoenixRising, secondWind, neverGiveUp, earlyBird, nightOwl, perfectWeek, perfectMonth, teamPlayer, cheerleader, popular, photographer, honestAbe) — confirmed by `algorithm-spec.md §6` and `award-vectors.json` ✓
-- XP/Level system (thresholds 0/50/150/350/700, level names Starter/Committed/Dedicated/Master/Legend) — confirmed by `xp-vectors.json` and `algorithm-spec.md §7` ✓
+- Commitment key fields (id, userId, title, frequency, gracePeriodHours, groupId, partnerUserId, notificationConfig, renewedAt, extendedAt) — confirmed by `algorithm-spec.md §3` ✓
+- User model fields (14 algorithm-facing fields) — confirmed by `shared/test-vectors/award-vectors.json` (id, totalCheckIns, totalPhotoProofs, totalHonorCheckIns, reactionsGiven, reactionsReceived, comebackCount, earnedAwardTypes, currentStreak, longestStreak, lastCheckInDateSeconds, timezone) ✓
+- Streak model fields (id, userIDs, isPaused, pausedAtSeconds, pauseResumeDateSeconds, currentStreak, longestStreak, lastCompletionDateSeconds, isBroken formula) — confirmed by `streak-vectors.json` ✓
+- Award types (all 18) — confirmed by `algorithm-spec.md §6` and `award-vectors.json` ✓
+- XP/Level system (thresholds 0/50/150/350/700, Starter/Committed/Dedicated/Master/Legend) — confirmed by `xp-vectors.json` and `algorithm-spec.md §7` ✓
 - Day Key formula (`year * 10000 + dayOfYear`) — confirmed by `algorithm-spec.md §1` ✓
 
 ---
 
 ## context/firebase-schema.md
 
-### STALE
+### GAP (pre-existing)
 
-- **`agentRuns.variantsGenerated` type** — Doc said `[variantId]` (implying IDs). Actual: `agent/notification_agent.py:219-221` stores `[v["copyTitle"] for v in new_variants]` — a list of copy title strings, not IDs. **Fixed:** changed to `[string] // list of copyTitle strings (not IDs)`.
-
-- **`agentRuns.status` value set** — Doc said `"running" | "complete" | "failed" | "skipped"`. Agent code only writes `"complete"` (`notification_agent.py:213`) or `"skipped"` (`notification_agent.py:272`). `"running"` and `"failed"` appear in `SPEC.md §2.1` but are not implemented in current agent code. **Fixed:** narrowed to `"complete" | "skipped"` with note about planned values.
-
-### GAP
-
-- Cloud Functions list (`onGroupInvitationCreated`, `onPartnerInvitationCreated`, `onStreakBreak`, `onUserRemovedFromGroup`, `onPartnerCheckIn`, `suppressAfterCheckIn`, `updateUserNotificationProfile`) — cannot verify without `microcommit/functions/src/index.ts` (lives in iOS repo, not this management repo). <!-- GAP: verify Cloud Functions list against index.ts when iOS repo is available -->
+- Cloud Functions list (`onGroupInvitationCreated`, `onPartnerInvitationCreated`, `onStreakBreak`, `onUserRemovedFromGroup`, `onPartnerCheckIn`, `suppressAfterCheckIn`, `updateUserNotificationProfile`) — cannot verify without `microcommit/functions/src/index.ts` (lives in iOS repo, not this management repo). `<!-- GAP: verify Cloud Functions list against index.ts when iOS repo is available -->` comment already documented inline in `firebase-schema.md`.
 
 ### OK (5)
 
 - Core app Firestore collections (`/users`, `/commitments`, `/checkIns`, `/groups`, `/groupInvitations`, `/partnerInvitations`) ✓
-- `notificationEvents` fields (all confirmed against agent pull_experiment_results code) ✓
+- `notificationEvents` fields — confirmed against `notification_agent.py:pull_experiment_results()` ✓
 - `notificationVariants` fields (triggerType, copyTitle, copyBody, createdByAgent, agentRunId, createdAt, isActive, cohortTag) — confirmed by `notification_agent.py:189-203` ✓
-- `agentRuns` core fields (runAt, hypothesis, conclusions, nextHypothesis, rewardScores, variantsDeactivated, guardRailWarnings, totalEventsSent) — confirmed by `notification_agent.py:209-227` ✓
+- `agentRuns` fields (runAt, hypothesis, conclusions, nextHypothesis, status, rewardScores, variantsGenerated as copyTitle strings, variantsDeactivated, guardRailWarnings, totalEventsSent) — confirmed by `notification_agent.py:207-227`; prior STALE fixes from 2026-06-12 audit still accurate ✓
 - Storage path and security rules ✓
 
 ---
 
 ## context/streak-rules.md
 
-### GAP
+### GAP (pre-existing)
 
-- **`gracePeriodHours` vs "no grace period" contradiction** — The "Technical Details" section documents `gracePeriodHours` as a window after midnight before a streak breaks. But `algorithm-spec.md §4` states explicitly: "There is no grace period — a streak breaks at the start of the day after the missed day." The field exists on the Commitment model but may be enforced only by client code, not reflected in the canonical algorithm spec. <!-- GAP: investigate --> comment added inline.
+- **`gracePeriodHours` vs "no grace period" contradiction** — The Commitment model carries `gracePeriodHours` but `algorithm-spec.md §4` states "There is no grace period." Field may be enforced only by mobile client logic not captured in the canonical spec. `<!-- GAP: investigate -->` comment already documented inline. Cannot verify without mobile StreakCalculationService files.
 
 ### OK (7)
 
@@ -68,42 +62,43 @@ Date: 2026-06-12
 - Solo streak rules (check-in → +1, miss → 0, renew resets, extend continues) — confirmed by `algorithm-spec.md §2.2` and `Streakalgorithm.md` ✓
 - Group allIn rules (intersection of ALL members, any miss resets everyone, member removal recalculates with remaining) — confirmed by `algorithm-spec.md §2.4` ✓
 - Group individual rules (independent solo streaks per member, no cross-member impact) — confirmed by `algorithm-spec.md §2.5` ✓
-- Partnership Lifecycle (mid-stream carry-over, dissolution, removal) — confirmed by `algorithm-spec.md §2.6` and `Streakalgorithm.md` ✓
-- User-Level Streak Outcome (`computeUserStreakOutcome` rules 1–5) — verified against `algorithm-spec.md §5` and all 5 user-outcome vectors in `streak-vectors.json` ✓
-- Day Key formula and Pause/Resume reference ✓
+- Partnership Lifecycle (mid-stream carry-over, dissolution, partner removed → solo continuation) — confirmed by `algorithm-spec.md §2.6` and `Streakalgorithm.md` ✓
+- User-Level Streak Outcome (`computeUserStreakOutcome` rules 1–5) — verified against `algorithm-spec.md §5` ✓
+- Day Key formula and Pause/Resume semantics ✓
 
 ---
 
 ## context/notification-system.md
 
-### OK (7)
+### STALE — Fixed
 
-- Five trigger types and when-to-fire conditions — confirmed by `algorithm-spec.md §1.1` and `notification_agent.py:23-29` ✓
-- AutoResearch loop (weekly Karpathy-style, pull → analyze → hypothesize → deploy) — confirmed by `notification_agent.py:run_agent()` ✓
+- **Architecture → Profile writer** — Doc said "agent writes" for `/userNotificationProfile/{userId}`. The Python agent (`agent/notification_agent.py`) does **not** write to `userNotificationProfile` — no references to that collection exist in the agent code. According to `SPEC.md §4`, the profile is written by the `updateUserNotificationProfile` Cloud Function (scheduled, runs nightly). **Fixed:** changed to "Cloud Function writes (nightly via `updateUserNotificationProfile`), client reads".
+  - Evidence: `agent/notification_agent.py` — `grep userNotificationProfile` → 0 matches
+  - Evidence: `SPEC.md` lines 283-288 — `updateUserNotificationProfile` (scheduled Cloud Function) writes the profile
+
+### OK (6)
+
+- Five trigger types and when-to-fire conditions — confirmed by `notification_agent.py:TRIGGER_TYPES` (23-29) and `SPEC.md §1.1` ✓
+- AutoResearch loop (weekly Karpathy-style pull → analyze → hypothesize → deploy) — confirmed by `notification_agent.py:run_agent()` ✓
 - Model `claude-sonnet-4-6` — confirmed by `notification_agent.py:21` (`MODEL = "claude-sonnet-4-6"`) ✓
-- Generates exactly 5 new variants — confirmed by `notification_agent.py:160` ("Generate exactly 5 new variants") ✓
+- Generates exactly 5 new copy variants — confirmed by `notification_agent.py:160` ("Generate exactly 5 new variants") ✓
 - Reward signal `checkedInWithin60Min` rate — confirmed by `notification_agent.py:57` ✓
 - Guard rails (opt-out rate < 2%) — confirmed by `notification_agent.py:32` (`MAX_OPT_OUT_RATE = 0.02`) ✓
-- Architecture (client scheduling, Firestore profile/events/variants, Cloud Functions partner push) ✓
 
 ---
 
 ## context/project-status.md
 
-### STALE
+### STALE — Fixed
 
-- **Last updated date** — Was `2026-06-05`; current date is `2026-06-12`. **Fixed.**
-
-### MISSING
-
-- **Outstanding Android performance bugs** — Known Bugs section only listed the splash screen issue. Sheldon's 2026-04-02 perf audit identified 16 issues; only 3 were fixed in the 2026-04-03 session (issues 1, 2, 6). Five CRITICAL/HIGH issues remain unaddressed (FeedScreen double-load, GroupRemoval double-queue, MyGoalsViewModel N+1 streak reads, GroupDetailViewModel thundering herd, unbounded completions fetch). **Fixed:** added all 5 to Known Bugs section with file:line references.
+- **Last updated date** — Was `2026-06-12`; current date is `2026-06-19`. **Fixed.**
 
 ### OK (4)
 
 - Platform overview table ✓
 - Active work tracking references (`todo.md`, `checklist.md`, `audit-remediation-status.md`, `NOTES.md`) ✓
-- Active branches noted (cannot verify against remote — branches live in separate repos) ✓
-- Key source locations ✓
+- Active branches (iOS `1.0.4`, Android `1.0.1` — live in separate repos; this management repo is on `main` only; branch entries unverifiable against mobile repos but consistent with prior audit) ✓
+- Known Bugs section (splash screen + 5 outstanding Android perf bugs added in 2026-06-12 audit) — no new agent memory files indicate these have been resolved; all remain outstanding ✓
 
 ---
 
@@ -111,23 +106,22 @@ Date: 2026-06-12
 
 | File | Used to verify |
 |---|---|
-| `algorithm-spec.md` | streak rules, award eligibility, XP/level system, day key, isBroken formula |
+| `algorithm-spec.md` | streak rules, award eligibility, XP/level system, day key, isBroken formula, pause/resume semantics |
 | `Streakalgorithm.md` | streak product rules, partnership lifecycle |
-| `SPEC.md` | Firebase schema (agentRuns, notificationVariants, notificationEvents, userNotificationProfile) |
-| `shared/test-vectors/streak-vectors.json` | Streak model fields, all user-outcome rules, solo/group/partnership calc |
-| `shared/test-vectors/award-vectors.json` | Award types, User model fields |
+| `SPEC.md` | Firebase schema, notification architecture, Cloud Functions, agent behavior spec |
+| `shared/test-vectors/streak-vectors.json` | Streak model fields, all user-outcome rules |
+| `shared/test-vectors/award-vectors.json` | Award types, User model algorithm-facing fields |
 | `shared/test-vectors/xp-vectors.json` | Level names and XP thresholds |
-| `agent/notification_agent.py` | Firestore schema (agentRuns, notificationVariants), agent behavior, model name, guard rails |
+| `agent/notification_agent.py` | Firestore write targets (confirming agent does NOT write userNotificationProfile), agentRuns/notificationVariants schema, model name, guard rails |
 | `NOTES.md` | Known bugs |
 | `.claude/agent-memory/sheldon/project_android_perf_audit.md` | Outstanding Android performance bugs |
 | `.claude/agent-memory/sheldon/project_perf_fixes_2026_04_03.md` | Which perf issues were resolved |
 
 ## Mobile Code Gap Note
 
-The iOS (`microcommit/`) and Android (`TinyAct---Android/`) repos are not cloned in this management repo. Findings that could only be verified with mobile code are marked as GAP. Affected docs:
-- `domain-models.md` → `streakBreakAcknowledgedAt` field, gracePeriodHours in client streak logic
-- `firebase-schema.md` → Cloud Functions list
-- `streak-rules.md` → gracePeriodHours enforcement in StreakCalculationService
-- `notification-system.md` → SmartNotificationScheduler.kt / NotificationScheduler.swift paths
+The iOS (`microcommit/`) and Android (`TinyAct---Android/`) repos are not cloned in this management repo. Findings that can only be verified with mobile code are marked as GAP. Affected docs:
+- `domain-models.md` → `streakBreakAcknowledgedAt` Streak field
+- `firebase-schema.md` → Cloud Functions list in `index.ts`
+- `streak-rules.md` → `gracePeriodHours` enforcement in StreakCalculationService
 
-Previous audit (2026-06-05) fixed all major STALE/MISSING items. This audit found 3 new STALE (2 in firebase-schema.md, 1 date in project-status.md), 1 MISSING (Android perf bugs in project-status.md), and 3 GAPs documented inline.
+Previous audit (2026-06-12) fixed 3 STALE + 1 MISSING items. This audit found 2 new STALE items (notification-system.md profile writer, project-status.md date). The 3 pre-existing GAPs remain open pending mobile repo access.
