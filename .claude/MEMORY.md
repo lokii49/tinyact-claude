@@ -31,17 +31,16 @@ Load only in main session (direct chat with Lokesh).
 
 ---
 
-## Squad Routing
+## Squad
 
-- Parity / QA / pre-release → Pam
-- Feature implementation / architecture / domain logic → Ross
-- Notification optimization / A/B testing / autoresearch → Dwight
-- Unclear or cross-cutting → Monica coordinates
+- Monica implements features, audits, writes code directly — no routing
+- Dwight handles autonomous research loops (autoresearch, notification A/B)
+- Invoke audit skills directly (parity, check-ins, auth, etc.) — no Pam intermediary
 
 ---
 
 ## Things to Watch
 
-- Never commit to `main` — always branch (`1.0.4` iOS, `1.0.1` Android)
+- Never commit to `main` — always branch (`1.1.0` iOS, `1.0.1` Android)
 - `AlgorithmParityTests.swift` + `AlgorithmParityTest.kt` are sacred — update test vectors if algo changes
 - Firebase Security Rules: `notificationVariants` = service account write only; `agentRuns` = admin read only
