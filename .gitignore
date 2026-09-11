@@ -5,6 +5,12 @@ TinyAct---Android/
 # Sensitive local settings
 .claude/settings.local.json
 
+# Signing credentials — never commit
+*.jks
+*.keystore
+*.p12
+*.mobileprovision
+
 # macOS
 .DS_Store
 **/.DS_Store
